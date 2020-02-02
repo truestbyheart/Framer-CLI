@@ -32,11 +32,11 @@ class CloneRespository{
          /*
           * STEP 4: Install composer packages
           */
-          $command ='cd ' .$name.' && php '.APPROOT.'/app/composer.phar install';
-          $output->writeln([
-              ' ',
-              '========Installing composer packages========']);
-          exec($command);
+//          $command ='cd ' .$name.' && composer install';
+//          $output->writeln([
+//              ' ',
+//              '========Installing composer packages========']);
+//          exec($command);
 
           /*
            * STEP 5: Final instructions for the dev.
@@ -44,7 +44,9 @@ class CloneRespository{
            $output->writeln([
             ' ',
             '========Instructions========',
-            '1.Run <info>cd '.$name.' </info>']);
+            '1.Run <info>cd '.$name.' </info>',
+            '2.Run <info>composer install</info>',
+            '3.Run <info>framer start</info>']);
 
     }
 }
