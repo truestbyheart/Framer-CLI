@@ -6,7 +6,7 @@ class CloneRespository{
         /*
          *STEP 1: Get the initial project structure from the official github repo.
          */
-        $repo_path = 'https://github.com/truestbyheart/PHP-MVC-Framework.git';
+        $repo_path = 'https://github.com/truestbyheart/Framer.git';
         $command = 'git clone ' . $repo_path;
         $output->writeln([' ', '========Cloning main repository========']);
         exec($command);
@@ -18,8 +18,8 @@ class CloneRespository{
         $output->writeln([
             ' ',
             '========Renaming Main repository========',
-            'Framer project ===> '.$name]);
-        $command = "mv PHP-MVC-Framework " . $name;
+            'Renaming Framer project -> '.$name]);
+        $command = "mv Framer " . $name;
         exec($command);
 
 
@@ -32,7 +32,7 @@ class CloneRespository{
          /*
           * STEP 4: Install composer packages
           */
-          $command = "composer install";
+          $command ='cd ' .$name.' && php '.APPROOT.'/app/composer.phar install';
           $output->writeln([
               ' ',
               '========Installing composer packages========']);
