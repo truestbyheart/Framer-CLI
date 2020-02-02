@@ -5,6 +5,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Framer\Commands\Helper\CloneRespository;
 
 class CreateApp extends Command
 {
@@ -12,18 +14,18 @@ class CreateApp extends Command
     protected function configure()
     {
         $this
-            ->setName('framer:generate')
-            ->setDescription('Generates a new Framer project.')
-            ->setHelp('Creates a New Framer Project.')
-            ->addArgument('app', InputArgument::OPTIONAL,'the name of your app');
+            ->setName('generate')
+            ->setDescription('Generates a new Framer Project/Component.')
+            ->setHelp('Creates a New Framer Project/Component.')
+            ->addArgument('app', InputArgument::REQUIRED,'The command to issue a new Framer Project/Component.')
+            ->addArgument('name',InputArgument::REQUIRED, "The name of your app/component.");
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-       // $output->writeln($input->getArgument('app'));
         switch ($input->getArgument('app')) {
-            case 'app':
-                $output->writeln("hello app");
+            case 'new':
+                CloneRespository::getInitialRepository($output, $input->getArgument('name'));
                 break;
             case 'component':
                 $output->writeln("hello Component");
@@ -33,7 +35,6 @@ class CreateApp extends Command
                     "<info>app</info>: Create a new Framer project.",
                     '<info>component</info>: Create a new Framer component/page.']);
         }
-        $output->write("Finished successfully");
 
         return 0;
     }

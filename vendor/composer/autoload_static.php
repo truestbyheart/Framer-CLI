@@ -58,6 +58,7 @@ class ComposerStaticInit986a11ee5b0885ef96dfe0406d19fc81
 
     public static $classMap = array (
         'Framer\\Commands\\CreateApp' => __DIR__ . '/../..' . '/src/Commands/CreateApp.php',
+        'Framer\\Commands\\Helper\\CloneRespository' => __DIR__ . '/../..' . '/src/Commands/Helper/clone-repository.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'Psr\\Container\\ContainerExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerExceptionInterface.php',
         'Psr\\Container\\ContainerInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerInterface.php',

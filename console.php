@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+namespace Framer;
+
 require_once __DIR__.'/vendor/autoload.php';
 
 use Framer\Commands\CreateApp;
