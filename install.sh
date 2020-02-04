@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 # REFER TO: https://misc.flogisoft.com/bash/tip_colors_and_formatting
 #color
-BOLD_BLUE="\e[1m\e[34m"
-NORMAL_TEXT="\e[0m"
-GREEN="\e[32m"
-BOLD_RED="\e[1m\e[31m"
-LIGHT_GRAY_BACKGROUND="\e[47m"
-
+setup_color() {
+	# Only use colors if connected to a terminal
+	if [ -t 1 ]; then
+		BOLD_RED=$(printf '\033[31m')
+		GREEN=$(printf '\033[32m')
+		BOLD_BLUE=$(printf '\033[34m')
+		BOLD=$(printf '\033[1m')
+		NORMAL_TEXT=$(printf '\033[m')
+	else
+		BOLD_RED=""
+		GREEN=""
+		BOLD_BLUE=""
+		BOLD=""
+		NORMAL_TEXT=""
+	fi
+}
 
 # REFER TO: https://linuxize.com/post/bash-functions/
 # REFER TO: https://www.linuxjournal.com/content/return-values-bash-functions
@@ -24,16 +34,16 @@ function clone_the_Framer_project {
    cd $HOME
    rm -rf Framer-CLI
    echo " "
-   echo -e "$GREEN======================================$NORMAL_TEXT"
+   echo "$GREEN======================================$NORMAL_TEXT"
    git clone https://github.com/truestbyheart/Framer-CLI.git
-   echo -e "$GREEN======================================$NORMAL_TEXT"
-     echo " "
+   echo "$GREEN======================================$NORMAL_TEXT"
+   echo " "
   else
    echo " "
-   echo -e "$BOLD_RED======================================"
+   echo "$BOLD_RED======================================"
    echo "= Please install git in your system  ="
    echo "= https://git-scm.com/downloads      ="
-   echo -e "======================================$NORMAL_TEXT"
+   echo "======================================$NORMAL_TEXT"
    echo " "
   fi
 }
@@ -44,6 +54,7 @@ function compile_Framer_Project {
 }
 
 # STEP 1: Check if php is installed
+ setup_color
  check_command="$(check_if_Command_exists "php")"
 
  if [[ "$result" -eq "yes" ]]; then
@@ -54,11 +65,11 @@ function compile_Framer_Project {
    # STEP 4: Add the framer alias to the ~/.bash or ~/.zshrc
    echo "Add the following line to your ~/.bash_profile or ~/.zshrc"
    echo " "
-   echo -e "$BOLD_BLUE alias framer=\"php $HOME/Framer-CLI/Framer.phar\" $NORMAL_TEXT"
+   echo "$BOLD_BLUE alias framer=\"php $HOME/Framer-CLI/Framer.phar\" $NORMAL_TEXT"
    echo " "
-   echo -e "$BOLD_BLUE========================================"
-   echo -e "= Thank you from installing Framer-CLI ="
-   echo -e "========================================$NORMAL_TEXT"
+   echo "$BOLD_BLUE========================================"
+   echo "= Thank you from installing Framer-CLI ="
+   echo "========================================$NORMAL_TEXT"
  else
    echo "php is not installed in this system"
  fi
