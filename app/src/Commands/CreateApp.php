@@ -1,6 +1,7 @@
 <?php
 namespace Framer\Commands;
 
+use Framer\Commands\Helper\Helper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,15 +26,15 @@ class CreateApp extends Command
     {
         switch ($input->getArgument('app')) {
             case 'new':
-                CloneRespository::getInitialRepository($output, $input->getArgument('name'));
+                Helper::getInitialRepository($output, $input->getArgument('name'));
                 break;
             case 'component':
-                $output->writeln("hello Component");
+                Helper::createNewComponent($output, $input->getArgument('name'));
                 break;
             default:
-                $output->writeln(['Please refer to this:',
-                    "<info>app</info>: Create a new Framer project.",
-                    '<info>component</info>: Create a new Framer component/page.']);
+                $output->writeln(["Please refer to this:",
+                    "<info>new</info>: Create a new Framer project.",
+                    "<info>component</info>: Create a new Framer component/page."]);
         }
 
         return 0;

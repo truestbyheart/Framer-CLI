@@ -7,7 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Framer\\Commands\\CreateApp' => $baseDir . '/src/Commands/CreateApp.php',
-    'Framer\\Commands\\Helper\\CloneRespository' => $baseDir . '/src/Commands/Helper/clone-repository.php',
+    'Framer\\Commands\\Helper\\CloneRespository' => $baseDir . '/src/Commands/Helper/Helper.php',
     'JsonException' => $vendorDir . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
     'Psr\\Container\\ContainerExceptionInterface' => $vendorDir . '/psr/container/src/ContainerExceptionInterface.php',
     'Psr\\Container\\ContainerInterface' => $vendorDir . '/psr/container/src/ContainerInterface.php',
