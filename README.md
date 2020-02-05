@@ -4,9 +4,6 @@ Framer CLI is the official set of command line tools that can be used to work wi
 **The CLI helps the user to**
  * Easily generate new project.
  * Generate new components/pages.
- * Install packages.
- * Do database Migrations.
- * Prepare the app for deployment.
  
 # Installation
 
