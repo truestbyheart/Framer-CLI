@@ -57,7 +57,7 @@ alias framer="php $HOME/Framer-CLI/Framer.phar"
 
 **NB**: $HOME is optional because its full path will be displayed once  the script has executed successfully.
 
-# How to build a new Framer app
+## How to build a new Framer app
 
 Once the installation is complete and the path is added to the shell configuration files i.e `~/.zshrc` or `~/.bash_profile` you can create a new project
 by running the following command on your terminal/CMD
@@ -69,5 +69,23 @@ framer generate new name_of_your_project
 **For example**
 
 ```bash
-framer genberate new todo-app
+framer generate new todo-app
+```
+## Generating new component
+Make sure you run the command on root of the project.
+
+```bash
+framer generate component name_of_component
+```
+
+**For example**
+
+```bash
+framer generate component home
+```
+
+or
+
+```bash
+framer generate component components/home/home
 ```
