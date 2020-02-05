@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Framer\Commands\Helper\CloneRespository;
 
+
 class CreateApp extends Command
 {
 
@@ -18,18 +19,18 @@ class CreateApp extends Command
             ->setName('generate')
             ->setDescription('Generates a new Framer Project/Component.')
             ->setHelp('Creates a New Framer Project/Component.')
-            ->addArgument('app', InputArgument::REQUIRED,'The command to issue a new Framer Project/Component.')
+            ->addArgument('action', InputArgument::REQUIRED,'The command to issue a new Framer Project/Component.')
             ->addArgument('name',InputArgument::REQUIRED, "The name of your app/component.");
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        switch ($input->getArgument('app')) {
+        switch ($input->getArgument('action')) {
             case 'new':
-                Helper::getInitialRepository($output, $input->getArgument('name'));
+                Helper::get_Initial_Repository($output, $input->getArgument('name'));
                 break;
             case 'component':
-                Helper::createNewComponent($output, $input->getArgument('name'));
+                Helper::create_New_Component($output, $input->getArgument('name'));
                 break;
             default:
                 $output->writeln(["Please refer to this:",

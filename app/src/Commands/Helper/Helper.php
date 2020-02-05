@@ -2,14 +2,17 @@
 
 namespace Framer\Commands\Helper;
 
-class Helper
+use Framer\Commands\Template\Template;
+
+class Helper extends Template
 {
+
     /**
      * Create a new Framer application through cloning the main repo.
      * @param $output
      * @param $name
      */
-    static function getInitialRepository($output, $name)
+    static function get_Initial_Repository($output, $name)
     {
         /*
          *STEP 1: Get the initial project structure from the official github repo.
@@ -54,24 +57,24 @@ class Helper
      * @param $output
      * @param $component
      */
-    static function createNewComponent($output, $component)
+    static function create_New_Component($output, $component)
     {
-        #STEP 1: Check if we are in a framer app.
+        # Check if we are in a framer app.
         $framer_file = APPROOT . "/framer.json";
+        $real_path_to_controller = APPROOT . "/app/controller";
+        $real_path_to_view = APPROOT . "/app/views";
 
         if (file_exists($framer_file)) {
-            #STEP 2: Check if the component contains a folder path.
             $path = explode("/", $component);
 
+            # Check if the component contains a folder path.
             if (sizeof($path) > 1) {
                 #STEP 2-1: if folder doesn't exist generate one
                 $lastIndex = sizeof($path) - 1;
                 $dir = '';
 
                 # File name variables
-                $controller_file_name = $path[$lastIndex] . ".php";
-                $view_file_name = $path[$lastIndex] . ".blade.php";
-
+                $class_name = ucfirst($path[$lastIndex]);
 
                 # Building the folder path based on the passed parameter
                 foreach ($path as $key => $value) {
@@ -80,44 +83,55 @@ class Helper
                 }
 
                 # Absolute path to put the files
-                $abs_path_controller = APPROOT . "/app/controller" . $dir;
-                $abs_path_view = APPROOT . "/app/views";
+                $abs_path_controller = $real_path_to_controller . $dir;
 
-                if (!file_exists($abs_path_controller)) {
+                # Path to the files
+                $path_to_Controller_file = $abs_path_controller . "/" . $class_name . ".php";
+                $path_to_View_file = $real_path_to_view . "/" . $class_name . ".blade.php";
 
-                    #STEP 2-2: generate the file in the controller and views
+                # Check if controller path or view file exists.
+                if (!file_exists($abs_path_controller) && !file_exists($path_to_View_file)) {
+
+                    # Generate the file in the controller path directories.
                     if (mkdir($abs_path_controller, 0777, true)) {
-                        fopen($abs_path_controller . "/" . $controller_file_name, "w");
-                        fopen($abs_path_view . "/" . $view_file_name, "w");
-                        $output->writeln([
-                            "<info>Controller:</info> " . $abs_path_controller . "/" . $controller_file_name,
-                            "<info>View:</info> " . $abs_path_view . "/" . $view_file_name
-                        ]);
+                        # Generate the files.
+                        self::generate_controller_n_view_files(
+                            $class_name,
+                            $abs_path_controller,
+                            $real_path_to_view,
+                            $output
+                        );
                     } else {
+                        # inform the user to check file permission for PHP.
                         $output->writeln([
                             "Failed to generate new component.",
                             "Please check your write permission on PHP ini."]);
                     }
 
                 } else {
-                    if (file_exists($abs_path_controller . "/" . $controller_file_name) &&
-                        file_exists($abs_path_view . "/" . $view_file_name)) {
-                        $output->writeln([
-                            "Component already exists",
-                            "<info>Controller:</info> " . $abs_path_controller . "/" . $controller_file_name,
-                            "<info>View:</info> " . $abs_path_view . "/" . $view_file_name
-                        ]);
-                    }
-
-                    fopen($abs_path_controller . "/" . $controller_file_name, "w");
-                    fopen($abs_path_view . "/" . $view_file_name, "w");
-
-                    $output->writeln([
-                        "<info>Controller:</info> " . $abs_path_controller . "/" . $controller_file_name,
-                        "<info>View:</info> " . $abs_path_view . "/" . $view_file_name
-                    ]);
+                 if(file_exists($path_to_Controller_file) && file_exists($path_to_View_file)) {
+                     $output->writeln([
+                         "Component exists",
+                         "<info>Controller</info>: ".$path_to_Controller_file,
+                         "<info>View</info>: ".$path_to_View_file
+                     ]);
+                 } else {
+                     self::generate_controller_n_view_files(
+                         $class_name,
+                         $abs_path_controller,
+                         $real_path_to_view,
+                         $output
+                     );
+                 }
                 }
 
+            } else {
+                self::generate_controller_n_view_files(
+                    ucfirst($path[0]),
+                    $real_path_to_controller,
+                    $real_path_to_view,
+                    $output
+                );
             }
 
         } else {
@@ -130,7 +144,30 @@ class Helper
         }
 
 
-        #STEP 2-3: insert initial template for the files.
+    }
 
+    /**
+     * Generates and insert template for the new component.
+     * @param $file_name
+     * @param $controller_path
+     * @param $view_path
+     * @param $output
+     */
+    private function generate_controller_n_view_files($file_name, $controller_path, $view_path, $output)
+    {
+        # Generate Controller file and Insert initial code.
+        $controller_file = fopen($controller_path . "/" . $file_name . ".php", "w");
+        fwrite($controller_file, Template::controller_template($file_name));
+        fclose($controller_file);
+
+        # Generate View file and Insert initial code.
+        $view_file = fopen($view_path . "/" . $file_name . ".blade.php", "w");
+        fwrite($view_file, Template::view_template());
+        fclose($view_file);
+
+        $output->writeln([
+            "<info>Controller:</info>: " . $controller_path . "/" . $file_name . ".php",
+            "<info>View:</info>: " . $view_path . "/" . $file_name . ".blade.php"
+        ]);
     }
 }
