@@ -35,7 +35,20 @@ function clone_the_Framer_project {
    rm -rf Framer-CLI
    echo " "
    echo "$GREEN======================================$NORMAL_TEXT"
-   git clone https://github.com/truestbyheart/Framer-CLI.git
+   PS3="Select your installation package:"
+   select package in full-install phar-install;
+   do
+   case $package in
+   full-install)
+     git clone https://github.com/truestbyheart/Framer-CLI.git
+    ;;
+    phar-install)
+     mkdir Framer-CLI
+     cd Framer-CLI
+     wget --no-check-certificate --content-disposition https://github.com/truestbyheart/Framer-CLI/Framer.phar
+     ;;
+    esac
+   done
    echo "$GREEN======================================$NORMAL_TEXT"
    echo " "
   else
@@ -72,4 +85,5 @@ function compile_Framer_Project {
    echo "========================================$NORMAL_TEXT"
  else
    echo "php is not installed in this system"
+   echo "Please make sure PHP is installed and can be accessed globally"
  fi
