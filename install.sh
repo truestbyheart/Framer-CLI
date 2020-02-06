@@ -40,12 +40,17 @@ function clone_the_Framer_project {
    do
    case $package in
    full-install)
-     git clone https://github.com/truestbyheart/Framer-CLI.git
+      git clone https://github.com/truestbyheart/Framer-CLI.git
+      # STEP 3-opt-1: Compile the files to phar archive
+      compile_Framer_Project
+     break
     ;;
     phar-install)
+     # STEP 3-opt-2: Download the compiled the  phar archive
      mkdir Framer-CLI
      cd Framer-CLI
-     wget --no-check-certificate --content-disposition https://github.com/truestbyheart/Framer-CLI/Framer.phar
+     wget --no-check-certificate --content-disposition https://github.com/truestbyheart/Framer-CLI/tree/master/Framer.phar
+     break
      ;;
     esac
    done
@@ -69,12 +74,10 @@ function compile_Framer_Project {
 # STEP 1: Check if php is installed
  setup_color
  check_command="$(check_if_Command_exists "php")"
-
  if [[ "$result" -eq "yes" ]]; then
    # STEP 2: Clone the repository
    clone_the_Framer_project
-   # STEP 3: Compile the files to phr archive
-   compile_Framer_Project
+
    # STEP 4: Add the framer alias to the ~/.bash or ~/.zshrc
    echo "Add the following line to your ~/.bash_profile or ~/.zshrc"
    echo " "
