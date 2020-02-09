@@ -54,6 +54,19 @@ alias framer="php $HOME/Framer-CLI/Framer.phar"
 
 **NB**: $HOME is optional because its full path will be displayed once  the script has executed successfully.
 
+#### Types of Installation
+
+1. Full-install
+  
+  - This type of installation, clones the whole repository. it is a contributors choice where as you can modify and rebuild the app as you wish. But Please, share the love.
+  
+  **Note** In order to build the CLI you need to turn off the Phar readonly in your `php.ini` file.
+  
+
+2. phar-install
+  
+  - This installation downloads the build phar file from the repository. it is only for developer that only wish to use the CLI.
+
 ## How to build a new Framer app
 
 Once the installation is complete and the path is added to the shell configuration files i.e `~/.zshrc` or `~/.bash_profile` you can create a new project
