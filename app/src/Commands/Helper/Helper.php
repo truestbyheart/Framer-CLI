@@ -36,7 +36,7 @@ class Helper extends Template
         exec($command);
 
         # create and insert data to the framer.json file
-        $path_to_app = APPROOT."/".$name."/framer.json";
+        $path_to_app = APPROOT . "/" . $name . "/framer.json";
         $framer_file = fopen($path_to_app, "w");
         fwrite($framer_file, Template::framer_json_template($name));
         fclose($framer_file);
@@ -94,7 +94,7 @@ class Helper extends Template
                     # Generate the file in the controller path directories.
                     if (mkdir($abs_path_controller, 0777, true)) {
                         # Generate the files.
-                        self::generate_controller_n_view_files(
+                        (new Helper)->generate_controller_n_view_files(
                             $class_name,
                             $abs_path_controller,
                             $real_path_to_view,
@@ -108,24 +108,24 @@ class Helper extends Template
                     }
 
                 } else {
-                 if(file_exists($path_to_Controller_file) && file_exists($path_to_View_file)) {
-                     $output->writeln([
-                         "Component exists",
-                         "<info>Controller</info>: ".$path_to_Controller_file,
-                         "<info>View</info>: ".$path_to_View_file
-                     ]);
-                 } else {
-                     self::generate_controller_n_view_files(
-                         $class_name,
-                         $abs_path_controller,
-                         $real_path_to_view,
-                         $output
-                     );
-                 }
+                    if (file_exists($path_to_Controller_file) && file_exists($path_to_View_file)) {
+                        $output->writeln([
+                            "Component exists",
+                            "<info>Controller</info>: " . $path_to_Controller_file,
+                            "<info>View</info>: " . $path_to_View_file
+                        ]);
+                    } else {
+                        (new Helper)->generate_controller_n_view_files(
+                            $class_name,
+                            $abs_path_controller,
+                            $real_path_to_view,
+                            $output
+                        );
+                    }
                 }
 
             } else {
-                self::generate_controller_n_view_files(
+                (new Helper)->generate_controller_n_view_files(
                     ucfirst($path[0]),
                     $real_path_to_controller,
                     $real_path_to_view,
@@ -145,28 +145,41 @@ class Helper extends Template
 
     }
 
-    /**
-     * Generates and insert template for the new component.
-     * @param $file_name
-     * @param $controller_path
-     * @param $view_path
-     * @param $output
-     */
-    private function generate_controller_n_view_files($file_name, $controller_path, $view_path, $output)
-    {
-        # Generate Controller file and Insert initial code.
-        $controller_file = fopen($controller_path . "/" . $file_name . ".php", "w");
-        fwrite($controller_file, Template::controller_template($file_name));
-        fclose($controller_file);
+    static function create_New_Migration_File($output, $file){
+      $path_to_migration = APPROOT."/app/migration";
 
-        # Generate View file and Insert initial code.
-        $view_file = fopen($view_path . "/" . $file_name . ".blade.php", "w");
-        fwrite($view_file, Template::view_template());
-        fclose($view_file);
+      if(file_exists($path_to_migration)){
+          $file_name = date('YmdHi')."-".$file.".php";
+          $full_path_to_miggrations = $path_to_migration."/".$file_name;
+          fopen($full_path_to_miggrations,"w");
+      } else{
+         $output->writeln("fuck it");
+      }
+}
 
-        $output->writeln([
-            "<info>Controller:</info>: " . $controller_path . "/" . $file_name . ".php",
-            "<info>View:</info>: " . $view_path . "/" . $file_name . ".blade.php"
-        ]);
-    }
+/**
+ * Generates and insert template for the new component.
+ * @param $file_name
+ * @param $controller_path
+ * @param $view_path
+ * @param $output
+ */
+private
+function generate_controller_n_view_files($file_name, $controller_path, $view_path, $output)
+{
+    # Generate Controller file and Insert initial code.
+    $controller_file = fopen($controller_path . "/" . $file_name . ".php", "w");
+    fwrite($controller_file, Template::controller_template($file_name));
+    fclose($controller_file);
+
+    # Generate View file and Insert initial code.
+    $view_file = fopen($view_path . "/" . $file_name . ".blade.php", "w");
+    fwrite($view_file, Template::view_template());
+    fclose($view_file);
+
+    $output->writeln([
+        "<info>Controller:</info>: " . $controller_path . "/" . $file_name . ".php",
+        "<info>View:</info>: " . $view_path . "/" . $file_name . ".blade.php"
+    ]);
+}
 }
