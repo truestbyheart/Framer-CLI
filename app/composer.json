@@ -1,7 +1,8 @@
 {
     "require": {
         "symfony/console": "^5.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-4": {

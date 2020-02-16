@@ -14,7 +14,7 @@ class CreateMigration extends Command
 {
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        Helper::create_New_Migration_File($output, $input->getArgument("file_name"));
+        (new Helper())->create_New_Migration_File($output, $input->getArgument("file_name"));
         return 0;
     }
 

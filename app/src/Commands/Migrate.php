@@ -21,7 +21,7 @@ class Migrate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
   {
-      (new MigrationBuilder())->get_Table_Name_Properties();
+      (new MigrationBuilder())->get_Table_Name_Properties($output);
       return 0;
   }
 }

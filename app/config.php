@@ -1,2 +1,3 @@
 <?php
-define("APPROOT", getcwd());
+define("CLIROOT", getcwd());
+

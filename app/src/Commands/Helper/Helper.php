@@ -6,10 +6,10 @@ use Framer\Commands\Template\Template;
 
 class Helper extends Template
 {
-    protected $framer_file = APPROOT . "/framer.json";
-    protected $path_to_migration = APPROOT . "/app/migration";
-    protected $real_path_to_controller = APPROOT . "/app/controller";
-    protected $real_path_to_view = APPROOT . "/app/views";
+    protected $framer_file = CLIROOT . "/framer.json";
+    protected $path_to_migration = CLIROOT . "/app/migration";
+    protected $real_path_to_controller = CLIROOT . "/app/controller";
+    protected $real_path_to_view = CLIROOT . "/app/views";
 
     /**
      * Create a new Framer application through cloning the main repo.
@@ -40,7 +40,7 @@ class Helper extends Template
         exec($command);
 
         # create and insert data to the framer.json file
-        $path_to_app = APPROOT . "/" . $name . "/framer.json";
+        $path_to_app = CLIROOT . "/" . $name . "/framer.json";
         $framer_file = fopen($path_to_app, "w");
         fwrite($framer_file, Template::framer_json_template($name));
         fclose($framer_file);
@@ -177,7 +177,7 @@ class Helper extends Template
      */
     static function create_New_Migration_File($output, $file)
     {
-        $file_name = date('YmdHi') . "-" . $file . ".php";
+        $file_name = date('YmdHi') . "-" . $file . ".json";
         $full_path_to_migrations = (new Helper)->path_to_migration . "/" . $file_name;
 
         if ((new Helper)->is_Framer_Project($output)) {
@@ -186,7 +186,7 @@ class Helper extends Template
                 $output->writeln(["<info>Migration:</info>" . $full_path_to_migrations]);
             } else {
                 if ((new Helper)->create_A_Folder((new Helper)->path_to_migration, $output)) {
-                    $file_name = date('YmdHi') . "-" . $file . ".php";
+                    $file_name = date('YmdHi') . "-" . $file . ".json";
                     $full_path_to_migrations = (new Helper)->path_to_migration . "/" . $file_name;
                     fopen($full_path_to_migrations, "w");
                     $output->writeln(["<info>Migration:</info>" . $full_path_to_migrations]);

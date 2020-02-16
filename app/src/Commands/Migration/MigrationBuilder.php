@@ -4,20 +4,15 @@
 namespace Framer\Commands\Migration;
 
 use Framer\Commands\Database\DatabaseDataTypes;
+use Framer\Commands\Database\DatabaseHelper;
 
 class MigrationBuilder
 {
-    /**
-     * MigrationBuilder constructor.
-     */
-    public function __construct()
-    {
-    }
 
-    function get_Table_Name_Properties()
+    function get_Table_Name_Properties($output)
     {
         # Get the files from migration folder
-        $path_to_migration = APPROOT . '/app/migration';
+        $path_to_migration = CLIROOT . '/app/migration';
 
         # Check if exists
         if (file_exists($path_to_migration)) {
@@ -28,11 +23,18 @@ class MigrationBuilder
                 # Read the json object
                 $table_data = file_get_contents($file);
 
+                # Get filename from the path
+                $part_of_file_path = explode("/",$file);
+                $file_name= $part_of_file_path[count($part_of_file_path)-1];
+
                 # Convert it to a PHP object
-                $obj = json_decode($table_data);
+                $obj = json_decode($table_data, true);
 
                 # Create SQL statement
-                $this->generate_SQL_Query($obj);
+                $sql= $this->generate_SQL_Query($obj);
+
+                # Build the tables
+                (new DatabaseHelper())->create_table($sql, $file_name, $output);
 
             }
         }
@@ -41,22 +43,32 @@ class MigrationBuilder
 
     function generate_SQL_Query($obj)
     {
-        $table_name = $obj->table_name;
+        $table_name = $obj["table_name"];
         $property_string = "";
         $col_str = "";
-        $result="";
+        $num_col = count($obj["column"], COUNT_NORMAL);
+        $col_index = 0;
+        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . "(";
 
-        foreach ($obj->column as $col_name => $data_types) {
+        foreach ($obj["column"] as $col_name => $data_types) {
             foreach ($data_types as $key => $property) {
                 $result = (new DatabaseDataTypes())->determine_key_provided($key, $property);
-                echo $col_name;
                 $property_string = $property_string . " " . $result;
             }
-            // $col_str = $col_str . $property_string;
-//            echo $property_string."\n";
-//            echo $col_name." ".$property_string.",\n";
+            # Check next column
+            $col_index++;
+
+            # Creating the column string and its datatype
+            $col_str = $col_str . $property_string;
+            $col_name . " " . $col_str . ",";
+
+            # Removes the , from column string.
+            $sql = $col_index == $num_col ?  $sql . $col_name . " " . $col_str : $sql . $col_name . " " . $col_str . ",";
+            $col_str = "";
+            $property_string = "";
         }
 
-        // return "CREATE TABLE " . $table_name . "(" . $col_str . ")";
+        # Complete the SQL query and close it
+        return $sql . ")";
     }
 }
