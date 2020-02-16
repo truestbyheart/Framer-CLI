@@ -6,6 +6,10 @@ use Framer\Commands\Template\Template;
 
 class Helper extends Template
 {
+    protected $framer_file = APPROOT . "/framer.json";
+    protected $path_to_migration = APPROOT . "/app/migration";
+    protected $real_path_to_controller = APPROOT . "/app/controller";
+    protected $real_path_to_view = APPROOT . "/app/views";
 
     /**
      * Create a new Framer application through cloning the main repo.
@@ -58,12 +62,8 @@ class Helper extends Template
      */
     static function create_New_Component($output, $component)
     {
-        # Check if we are in a framer app.
-        $framer_file = APPROOT . "/framer.json";
-        $real_path_to_controller = APPROOT . "/app/controller";
-        $real_path_to_view = APPROOT . "/app/views";
 
-        if (file_exists($framer_file)) {
+        if (file_exists((new Helper())->framer_file)) {
             $path = explode("/", $component);
 
             # Check if the component contains a folder path.
@@ -82,11 +82,11 @@ class Helper extends Template
                 }
 
                 # Absolute path to put the files
-                $abs_path_controller = $real_path_to_controller . $dir;
+                $abs_path_controller = (new Helper())->real_path_to_controller . $dir;
 
                 # Path to the files
-                $path_to_Controller_file = $abs_path_controller . "/" . $class_name . ".php";
-                $path_to_View_file = $real_path_to_view . "/" . $class_name . ".blade.php";
+                $path_to_Controller_file = (new Helper())->real_path_to_controller . "/" . $class_name . ".php";
+                $path_to_View_file = (new Helper())->real_path_to_view . "/" . $class_name . ".blade.php";
 
                 # Check if controller path or view file exists.
                 if (!file_exists($abs_path_controller) && !file_exists($path_to_View_file)) {
@@ -97,7 +97,7 @@ class Helper extends Template
                         (new Helper)->generate_controller_n_view_files(
                             $class_name,
                             $abs_path_controller,
-                            $real_path_to_view,
+                            (new Helper())->real_path_to_view,
                             $output
                         );
                     } else {
@@ -118,7 +118,7 @@ class Helper extends Template
                         (new Helper)->generate_controller_n_view_files(
                             $class_name,
                             $abs_path_controller,
-                            $real_path_to_view,
+                            (new Helper())->real_path_to_view,
                             $output
                         );
                     }
@@ -127,8 +127,8 @@ class Helper extends Template
             } else {
                 (new Helper)->generate_controller_n_view_files(
                     ucfirst($path[0]),
-                    $real_path_to_controller,
-                    $real_path_to_view,
+                    (new Helper())->real_path_to_controller,
+                    (new Helper())->real_path_to_view,
                     $output
                 );
             }
@@ -145,41 +145,91 @@ class Helper extends Template
 
     }
 
-    static function create_New_Migration_File($output, $file){
-      $path_to_migration = APPROOT."/app/migration";
+    /**
+     * Generates and insert template for the new component.
+     * @param $file_name
+     * @param $controller_path
+     * @param $view_path
+     * @param $output
+     */
+    private function generate_controller_n_view_files($file_name, $controller_path, $view_path, $output)
+    {
+        # Generate Controller file and Insert initial code.
+        $controller_file = fopen($controller_path . "/" . $file_name . ".php", "w");
+        fwrite($controller_file, Template::controller_template($file_name));
+        fclose($controller_file);
 
-      if(file_exists($path_to_migration)){
-          $file_name = date('YmdHi')."-".$file.".php";
-          $full_path_to_miggrations = $path_to_migration."/".$file_name;
-          fopen($full_path_to_miggrations,"w");
-      } else{
-         $output->writeln("fuck it");
-      }
-}
+        # Generate View file and Insert initial code.
+        $view_file = fopen($view_path . "/" . $file_name . ".blade.php", "w");
+        fwrite($view_file, Template::view_template());
+        fclose($view_file);
 
-/**
- * Generates and insert template for the new component.
- * @param $file_name
- * @param $controller_path
- * @param $view_path
- * @param $output
- */
-private
-function generate_controller_n_view_files($file_name, $controller_path, $view_path, $output)
-{
-    # Generate Controller file and Insert initial code.
-    $controller_file = fopen($controller_path . "/" . $file_name . ".php", "w");
-    fwrite($controller_file, Template::controller_template($file_name));
-    fclose($controller_file);
+        $output->writeln([
+            "<info>Controller:</info>: " . $controller_path . "/" . $file_name . ".php",
+            "<info>View:</info>: " . $view_path . "/" . $file_name . ".blade.php"
+        ]);
+    }
 
-    # Generate View file and Insert initial code.
-    $view_file = fopen($view_path . "/" . $file_name . ".blade.php", "w");
-    fwrite($view_file, Template::view_template());
-    fclose($view_file);
+    /**
+     * Creates a new file for the migration.
+     * @param $output
+     * @param $file
+     */
+    static function create_New_Migration_File($output, $file)
+    {
+        $file_name = date('YmdHi') . "-" . $file . ".php";
+        $full_path_to_migrations = (new Helper)->path_to_migration . "/" . $file_name;
 
-    $output->writeln([
-        "<info>Controller:</info>: " . $controller_path . "/" . $file_name . ".php",
-        "<info>View:</info>: " . $view_path . "/" . $file_name . ".blade.php"
-    ]);
-}
+        if ((new Helper)->is_Framer_Project($output)) {
+            if (file_exists((new Helper)->path_to_migration)) {
+                fopen($full_path_to_migrations, "w");
+                $output->writeln(["<info>Migration:</info>" . $full_path_to_migrations]);
+            } else {
+                if ((new Helper)->create_A_Folder((new Helper)->path_to_migration, $output)) {
+                    $file_name = date('YmdHi') . "-" . $file . ".php";
+                    $full_path_to_migrations = (new Helper)->path_to_migration . "/" . $file_name;
+                    fopen($full_path_to_migrations, "w");
+                    $output->writeln(["<info>Migration:</info>" . $full_path_to_migrations]);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Checks is the your in the framer project
+     * @param $output
+     * @return bool
+     */
+    public function is_Framer_Project($output)
+    {
+        if ((new Helper)->framer_file) {
+            return true;
+        } else {
+            $output->writeln([
+                "<error>Framer command couldn't run.</error>",
+                "<info>Possible causes:</info>",
+                "1. you are running this command outside a framer project.",
+                "2. You are not at the root of the project."
+            ]);
+        }
+    }
+
+    /**
+     * Creates folder.
+     * @param $path
+     * @param $output
+     * @return bool
+     */
+    public function create_A_Folder($path, $output)
+    {
+        if (mkdir($path, 0777, true)) {
+            return true;
+        } else {
+            # inform the user to check file permission for PHP.
+            $output->writeln([
+                "Failed to generate new component.",
+                "Please check your write permission on PHP ini."]);
+        }
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+namespace Framer\Commands\Migration;
 
 interface Migration {
      function generate_SQL_Query();
