@@ -3,6 +3,7 @@
 namespace Framer\Commands\Database;
 
 use PDO;
+use PDOException;
 
 require_once CLIROOT . "/app/config/config.php";
 
@@ -45,5 +46,16 @@ class DatabaseHelper
             $output->writeln(["<error>Failed to migrate " . $file_name . "</error>",
                 $this->error]);
         }
+    }
+
+    private function check_if_migrated($file_name) {
+        $create_sql = "CREATE TABLE IF NOT EXISTS migration (id INT PRIMARY KEY, filename TEXT NOT NULL)";
+        $select_sql = "SELECT * FROM migration";
+        $insert_sql = "INSERT INTO migration (filename) VALUES(".$file_name.")";
+
+        if($this->db_handler->query($create_sql) != false) {
+            $this->db_handler->exec($insert_sql);
+        }
+
     }
 }
