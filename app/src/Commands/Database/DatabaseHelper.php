@@ -16,7 +16,6 @@ class DatabaseHelper
 
 
     private $db_handler;
-    private $stmt;
     private $error;
 
     /**
@@ -38,24 +37,65 @@ class DatabaseHelper
         }
     }
 
-    public function create_table($sql, $file_name, $output)
+    public function check_if_migrated($sql, $file_name, $output)
     {
-        if ($this->db_handler->query($sql) != false) {
-            $output->writeln(["<info>==========" . $file_name . "==========</info>"]);
-        } else {
-            $output->writeln(["<error>Failed to migrate " . $file_name . "</error>",
-                $this->error]);
+        $create_sql = "CREATE TABLE migration (id INT PRIMARY KEY AUTO_INCREMENT, filename TEXT NOT NULL)";
+
+        # Check if the table is generated.
+        try {
+            $this->db_handler->query($create_sql);
+        } catch (PDOException $exception) {
+
+            if (!$this->check_if_filename_exists($file_name, $output)) {
+                $is_created = $this->create_table($sql, $file_name, $output);
+                $is_created ?
+                    $this->insert_filename($file_name, $output) :
+                    $output->writeln([
+                        $file_name." is not migrated to Database.",
+                        "Please read the migration documentation."
+                    ]);
+            }
+
+        }
+
+    }
+
+    private function check_if_filename_exists($file_name, $output)
+    {
+        $select_sql = "SELECT * FROM migration WHERE filename=:file";
+        try {
+            $sql_stmt = $this->db_handler->prepare($select_sql);
+            $sql_stmt->bindParam(":file", $file_name);
+            $sql_stmt->execute();
+            $value = $sql_stmt->fetch(PDO::FETCH_ASSOC);
+
+            return gettype($value) === "array" ? true : false;
+        } catch (PDOException $exception) {
+            $output->writeln($exception->getMessage());
         }
     }
 
-    private function check_if_migrated($file_name) {
-        $create_sql = "CREATE TABLE IF NOT EXISTS migration (id INT PRIMARY KEY, filename TEXT NOT NULL)";
-        $select_sql = "SELECT * FROM migration";
-        $insert_sql = "INSERT INTO migration (filename) VALUES(".$file_name.")";
-
-        if($this->db_handler->query($create_sql) != false) {
-            $this->db_handler->exec($insert_sql);
+    public function create_table($sql, $file_name, $output)
+    {
+        try {
+            $this->db_handler->query($sql);
+            $output->writeln(["<info>==========" . $file_name . "==========</info>"]);
+            return true;
+        } catch (PDOException $exception) {
+            $output->writeln(["<error>Failed to migrate " . $file_name . "</error>",
+                $exception->getMessage()]);
         }
+    }
 
+    private function insert_filename($file_name, $output)
+    {
+        $insert_sql = "INSERT INTO migration (filename) VALUES(:filename)";
+        try {
+            $sql_stmt = $this->db_handler->prepare($insert_sql);
+            $sql_stmt->bindParam(":filename", $file_name);
+            $sql_stmt->execute();
+        } catch (PDOException $exception) {
+            $output->writeln($exception->getMessage());
+        }
     }
 }

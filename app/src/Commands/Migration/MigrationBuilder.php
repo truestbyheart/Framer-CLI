@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Framer\Commands\Migration;
 
 use Framer\Commands\Database\DatabaseDataTypes;
@@ -9,7 +8,7 @@ use Framer\Commands\Database\DatabaseHelper;
 class MigrationBuilder
 {
 
-    function get_Table_Name_Properties($output)
+    public function get_Table_Name_Properties($output)
     {
         # Get the files from migration folder
         $path_to_migration = CLIROOT . '/app/migration';
@@ -41,21 +40,21 @@ class MigrationBuilder
                 }
 
                 # Build the tables
-                (new DatabaseHelper())->create_table($sql, $file_name, $output);
+                (new DatabaseHelper())->check_if_migrated($sql, $file_name, $output);
 
             }
         }
 
     }
 
-    function create_table_SQL($obj)
+    public function create_table_SQL($obj)
     {
         $table_name = $obj["table_name"];
         $property_string = "";
         $col_str = "";
         $num_col = count($obj["column"], COUNT_NORMAL);
         $col_index = 0;
-        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . "(";
+        $sql = "CREATE TABLE " . $table_name . "(";
 
         foreach ($obj["column"] as $col_name => $data_types) {
             foreach ($data_types as $key => $property) {
@@ -80,7 +79,7 @@ class MigrationBuilder
     }
 
 
-    function add_column($obj)
+    public function add_column($obj)
     {
         $table_name = $obj["table_name"];
         $property_string = "";
@@ -114,7 +113,7 @@ class MigrationBuilder
         return $sql;
     }
 
-    function remove_column($obj)
+    public function remove_column($obj)
     {
         $table_name = $obj["table_name"];
         $col_str = "";
@@ -141,7 +140,8 @@ class MigrationBuilder
         return $sql;
     }
 
-    function update_column($obj){
+    function update_column($obj)
+    {
 
     }
 }

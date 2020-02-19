@@ -32,7 +32,7 @@ Make sure the following are installed on your system
  4. Make sure the git bash has `curl` or `wget` installed
   
 ### For MacOs users
-To install the CLI o nyour system run one of the following command based on your preferences
+To install the CLI on your system run one of the following command based on your preferences
 
 **via curl**
 
@@ -62,7 +62,6 @@ alias framer="php $HOME/Framer-CLI/Framer.phar"
   
   **Note** In order to build the CLI you need to turn off the Phar readonly in your `php.ini` file.
   
-
 2. phar-install
   
   - This installation downloads the build phar file from the repository. it is only for developer that only wish to use the CLI.
@@ -99,3 +98,5 @@ or
 ```bash
 framer generate component components/home/home
 ```
+
+## Working with migration
