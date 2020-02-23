@@ -45,7 +45,7 @@ class DatabaseHelper
         try {
             $this->db_handler->query($create_sql);
         } catch (PDOException $exception) {
-
+            echo $sql."\n";
             if (!$this->check_if_filename_exists($file_name, $output)) {
                 $is_created = $this->create_table($sql, $file_name, $output);
                 $is_created ?

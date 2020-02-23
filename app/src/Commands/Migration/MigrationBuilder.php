@@ -47,11 +47,12 @@ class MigrationBuilder
 
     }
 
-    public function create_table_SQL($obj)
+    private function create_table_SQL($obj)
     {
         $table_name = $obj["table_name"];
         $property_string = "";
         $col_str = "";
+
         $num_col = count($obj["column"], COUNT_NORMAL);
         $col_index = 0;
         $sql = "CREATE TABLE " . $table_name . "(";
@@ -69,17 +70,50 @@ class MigrationBuilder
             $col_name . " " . $col_str . ",";
 
             # Removes the , from column string.
-            $sql = $col_index == $num_col ? $sql . $col_name . " " . $col_str : $sql . $col_name . " " . $col_str . ",";
+            $sql = $col_index == $num_col ?
+            $sql . $col_name . " " . $col_str :
+            $sql . $col_name . " " . $col_str . ",";
+
+            # Remove the current value
             $col_str = "";
             $property_string = "";
         }
 
-        # Complete the SQL query and close it
-        return $sql . ")";
+        # check for relationships
+        if (isset($obj["relationship"])) {
+            $relationship = $this->create_relationship($obj["relationship"]);
+            echo $sql . "," . $relationship . ")\n";
+            return $sql . "," . $relationship . ")";
+        } else {
+            # Complete the SQL query and close it
+            return $sql . ")";
+        }
+
     }
 
+    private function create_relationship($relationship)
+    {
+        $fk_sql = "";
+        $count = count($relationship,COUNT_NORMAL);
+        $index = 0;
+        foreach ($relationship as $item) {
+            $fk_str = "FOREIGN KEY (" .
+                $item["foreign_key"] .
+                ") REFERENCES " . $item["references"]["table_name"] .
+                "(" . $item["references"]["column"] . ") ON DELETE CASCADE";
 
-    public function add_column($obj)
+            $index++;
+
+            $index === $count ?
+                $fk_sql = $fk_sql . "\n" . $fk_str :
+                $fk_sql = $fk_sql . "\n" . $fk_str.",";
+
+        }
+
+        return $fk_sql;
+    }
+
+    private function add_column($obj)
     {
         $table_name = $obj["table_name"];
         $property_string = "";
@@ -113,7 +147,7 @@ class MigrationBuilder
         return $sql;
     }
 
-    public function remove_column($obj)
+    private function remove_column($obj)
     {
         $table_name = $obj["table_name"];
         $col_str = "";
@@ -138,10 +172,5 @@ class MigrationBuilder
 
         # Complete the SQL query and close it
         return $sql;
-    }
-
-    function update_column($obj)
-    {
-
     }
 }
